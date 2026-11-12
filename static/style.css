@@ -1,0 +1,660 @@
+/* Created: 2026-11-10 11:46 */
+/*
+ * Portfolio styles. Two design axes, chosen in site.yaml:
+ *   theme    → <html data-theme="white|light|stone|taupe|gray|mist|espresso|dark|black|slate|navy|green|sage|lightsage|oxblood">   background tone
+ *   typeface → <html data-type="sans|serif">    Gothic (system) or Myeongjo (Noto Serif KR)
+ *   name_font → <html data-name="plain|cormorant|italiana|cinzel">   the header name only
+ * The site recedes like a gallery wall: neutral colours, small type, generous space.
+ */
+
+/* ---- Tokens ---------------------------------------------------------- */
+
+/* Background themes (2026-11-10: white, gray, black, navy added). --muted keeps at least
+   4.5:1 contrast with --bg, because it is used for small text. */
+:root,
+[data-theme="light"] {
+  --bg: #f2f0eb;          /* warm off-white, gallery wall */
+  --text: #2a2926;
+  --muted: #6f6b64;
+  --line: #dedad2;
+  --hover: #000;
+  color-scheme: light;
+}
+
+[data-theme="white"] {
+  --bg: #ffffff;          /* white cube */
+  --text: #222222;
+  --muted: #737373;
+  --line: #e6e6e6;
+  --hover: #000;
+  color-scheme: light;
+}
+
+[data-theme="gray"] {
+  --bg: #e2e1de;          /* soft gallery grey, calm behind colour work */
+  --text: #252523;
+  --muted: #62605b;
+  --line: #cbc9c4;
+  --hover: #000;
+  color-scheme: light;
+}
+
+[data-theme="stone"] {
+  --bg: #e8e5df;          /* greige: modern and quietly elegant, warm without looking beige */
+  --text: #1f1e1c;
+  --muted: #625e57;
+  --line: #d3cfc7;
+  --hover: #000;
+  color-scheme: light;
+}
+
+[data-theme="espresso"] {
+  --bg: #1e1b19;          /* warm charcoal with a hint of brown, softer than black */
+  --text: #ece6dd;
+  --muted: #9b9289;
+  --line: #363130;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+[data-theme="dark"] {
+  --bg: #1c1c1b;          /* deep charcoal, never pure black */
+  --text: #e4e1db;
+  --muted: #8e8a83;
+  --line: #34332f;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+[data-theme="black"] {
+  --bg: #0b0b0b;          /* near black, projection-room feel */
+  --text: #e8e6e1;
+  --muted: #8f8b84;
+  --line: #262624;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+[data-theme="mist"] {
+  --bg: #e6e9ec;          /* very pale blue-grey: white with a cool hint */
+  --text: #1e2226;
+  --muted: #5c636b;
+  --line: #cfd4d9;
+  --hover: #000;
+  color-scheme: light;
+}
+
+[data-theme="slate"] {
+  --bg: #22272d;          /* dark blue-grey, quieter and less blue than navy */
+  --text: #e4e7ea;
+  --muted: #949ca5;
+  --line: #363d45;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+[data-theme="taupe"] {
+  --bg: #d9d1c7;          /* warm taupe: one step deeper and warmer than greige */
+  --text: #231f1b;
+  --muted: #5a5148;
+  --line: #c4bbb0;
+  --hover: #000;
+  color-scheme: light;
+}
+
+[data-theme="green"] {
+  --bg: #1f2b25;          /* museum green: deep, muted wall of a painting gallery */
+  --text: #e6e8e1;
+  --muted: #97a299;
+  --line: #34433b;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+[data-theme="sage"] {
+  --bg: #363a38;          /* sage green: museum green lighter, saturation down to a quarter (2026-11-10 tuned) */
+  --text: #e7e9e4;
+  --muted: #a4ada7;
+  --line: #49504c;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+[data-theme="lightsage"] {
+  --bg: #dde3de;          /* light sage: pale grey with a hint of green */
+  --text: #1f231f;
+  --muted: #59615a;
+  --line: #c7cec8;
+  --hover: #000;
+  color-scheme: light;
+}
+
+[data-theme="oxblood"] {
+  --bg: #2b1a1c;          /* oxblood: deep wine, classical salon wall */
+  --text: #eee3df;
+  --muted: #a8948f;
+  --line: #45302f;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+[data-theme="navy"] {
+  --bg: #161b24;          /* deep ink blue */
+  --text: #e3e5ea;
+  --muted: #8f97a6;
+  --line: #2a3140;
+  --hover: #fff;
+  color-scheme: dark;
+}
+
+:root,
+[data-type="sans"] {
+  --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Helvetica Neue", sans-serif;
+  --weight: 400;
+  --weight-title: 500;
+  --tracking: 0.01em;
+}
+
+[data-type="serif"] {
+  --font: "Noto Serif KR", "AppleMyungjo", "Nanum Myeongjo", Georgia, serif;
+  --weight: 300;
+  --weight-title: 400;
+  --tracking: 0;
+}
+
+:root {
+  --gutter: clamp(16px, 4vw, 56px);
+  --page-max: 1280px;     /* content width shared by header, galleries and footer */
+  --gap: clamp(8px, 1.25vw, 18px);   /* space between works in masonry */
+  --measure: 34rem;       /* comfortable reading width for statements */
+  --work-max-h: 64vh;     /* tallest a work may be in the sequence view (84 → 72 → 64vh, 2026-11-10) */
+  /*
+   * Equal-area sizing: a work with aspect ratio r (= --r, width/height) gets
+   *   width = K·√r,  height = K/√r   → area K² for every work.
+   * K = 66vh puts a 2:3 portrait at ~81vh tall and a 3:2 landscape at ~81vh wide.
+   * On narrow screens K also stays below column width / √1.5, so a 3:2 landscape still
+   * fits the column and portraits shrink to the same area instead of filling the width.
+   */
+  --area-ref: 1.1547;     /* √(4/3): a 4:3 landscape (the operator's format) fills a column at equal area */
+  --area-k: min(58vh, calc((100vw - 2 * var(--gutter)) / var(--area-ref)));   /* 2026-11-10: 66 → 76 → 66 → 58vh (large view smaller) */
+}
+
+/* ---- Base ------------------------------------------------------------ */
+
+* { box-sizing: border-box; }
+
+html { background: var(--bg); }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-weight: var(--weight);
+  font-size: 15px;
+  line-height: 1.75;
+  letter-spacing: var(--tracking);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .3s ease, color .3s ease;
+  word-break: keep-all;        /* Korean: break lines between words, not inside them */
+  overflow-wrap: break-word;   /* but never let a long unbroken string overflow */
+}
+
+a { color: inherit; text-decoration: none; transition: color .2s ease; }
+a:hover { color: var(--hover); }
+
+img { display: block; max-width: 100%; height: auto; }
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+:focus-visible { outline: 1px solid var(--muted); outline-offset: 4px; }
+
+.year, .count, .work-detail { color: var(--muted); }
+.empty { color: var(--muted); padding: 24vh 0; text-align: center; }
+
+/* ---- Header & footer -------------------------------------------------- */
+
+/* Header, content and footer share one width so their edges line up. */
+.site-header, main, .site-footer {
+  width: 100%;
+  max-width: calc(var(--page-max) + 2 * var(--gutter));
+  margin-inline: auto;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  padding: 28px var(--gutter);
+}
+.site-name {
+  font-family: var(--name-font, var(--font));
+  font-size: var(--name-size, 15px);
+  font-weight: var(--name-weight, var(--weight-title));
+  letter-spacing: var(--name-spacing, 0.08em);
+  line-height: 1.2;
+}
+/* Name typeface (site.yaml name_font → <html data-name>). Latin display faces loaded from
+   Google Fonts with only the name's letters; anything else falls back to the body font. */
+[data-name="cormorant"] { --name-font: "Cormorant Garamond", var(--font); --name-size: 27px; --name-weight: 500; --name-spacing: 0.06em; }
+[data-name="italiana"]  { --name-font: "Italiana", var(--font);           --name-size: 26px; --name-weight: 400; --name-spacing: 0.12em; }
+[data-name="cinzel"]    { --name-font: "Cinzel", var(--font);             --name-size: 18px; --name-weight: 500; --name-spacing: 0.14em; }
+.site-header { flex-wrap: wrap; }
+.site-header nav { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 13px; color: var(--muted); }
+.site-header nav a:hover { color: var(--text); }
+.site-header nav a[aria-current="page"] { color: var(--text); }
+@media (max-width: 600px) { .site-header nav { gap: 8px 18px; } }
+
+main { padding: 0 var(--gutter) 96px; }
+
+.page-title {
+  font-size: 13px;
+  font-weight: var(--weight);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin: 40px 0 48px;
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 28px var(--gutter);
+  font-size: 12px;
+  color: var(--muted);
+}
+.site-footer p { margin: 0; }
+.site-footer .contact { display: flex; gap: 20px; }
+.site-footer.no-contact { justify-content: flex-end; }   /* © line stays on the right */
+
+/* ---- Home ------------------------------------------------------------- */
+
+.home-featured { display: grid; gap: 16vh; padding: 2vh 0 10vh; }
+/* The artist's name under the featured work was removed from view (2026-11-10, operator request);
+   the h1 stays for screen readers and search engines. The header already shows the name. */
+.home-name {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.featured-work { margin: 0; display: flex; justify-content: center; }
+.featured-work img { max-height: 62vh; width: auto; }   /* the first screen is not filled by one photo */
+
+.series-index { max-width: var(--measure); margin: 0 auto; }
+.index-category {
+  font-size: 12px;
+  font-weight: var(--weight);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin: 40px 0 10px;
+}
+.index-category:first-child { margin-top: 0; }
+.series-index ul { list-style: none; padding: 0; margin: 0; }
+.series-index li { border-top: 1px solid var(--line); }
+.series-index li:last-child { border-bottom: 1px solid var(--line); }
+.series-index a {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+}
+
+/* ---- Series list ------------------------------------------------------ */
+
+.series-grid { padding: 0; margin: 0; }
+.series-grid.count-1 { max-width: 1080px; margin: 0 auto; }
+.series-grid.count-2 { display: grid; gap: 72px 40px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr)); }
+.series-grid.count-many { --cols: 3; --gap: clamp(16px, 2.5vw, 40px); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 56px var(--gap); }   /* 3+ series: plain rows of equal cells (2026-11-11, was masonry) */
+@media (max-width: 1100px) { .series-grid.count-many { --cols: 2; } }
+@media (max-width: 600px)  { .series-grid.count-many { --cols: 1; } }
+.series-grid a { display: block; }
+.series-grid.count-1 .cover img { width: 100%; }
+.series-grid a:hover img { opacity: .92; }
+.series-meta { display: flex; gap: 12px; align-items: baseline; margin-top: 14px; }
+.series-meta .count { margin-left: auto; font-size: 12px; }
+
+/* ---- Series page ------------------------------------------------------ */
+
+/* Title block aligned with the left edge of the works below (2026-11-10). In the sequence view
+   gallery.js sets --head-indent to the first work's left edge; text keeps a reading width. */
+.series-header { margin: 40px 0 6vh; padding-left: var(--head-indent, 0px); }
+.series-header > * { max-width: var(--measure); }
+.breadcrumb { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 6px; font-size: 12px; letter-spacing: 0.04em; color: var(--muted); }
+.breadcrumb a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.breadcrumb a:hover { color: var(--text); text-decoration-color: currentColor; }
+
+/* Previous / next series, under the works */
+.series-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 12vh;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+.series-pager a { display: flex; flex-direction: column; gap: 6px; max-width: 48%; }
+.pager-next { margin-left: auto; text-align: right; align-items: flex-end; }
+.pager-label { font-size: 12px; letter-spacing: 0.04em; color: var(--muted); }
+.pager-title { font-size: 16px; font-weight: var(--weight-title); line-height: 1.4; }
+.series-pager a:hover .pager-label { color: var(--text); }
+.series-pager a:hover .pager-title { text-decoration: underline; text-underline-offset: 4px; }
+
+/* Previous / next series as fixed arrows, halfway down the screen, in the space outside the
+   content column (so they never cover a work). Hidden on narrow screens, where the margin is
+   too thin; the pager at the bottom stays. */
+.series-side a {
+  position: fixed;
+  top: 50%;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 64px;
+  font-size: 46px;
+  font-weight: 200;
+  line-height: 1;
+  color: var(--muted);
+  transition: color .2s ease;
+}
+/* centred in the free space beside the content column: half of max(gutter, side margin) */
+.series-side .side-prev { left: calc(max(var(--gutter), (100vw - var(--page-max)) / 2) / 2); }
+.series-side .side-next { right: calc(max(var(--gutter), (100vw - var(--page-max)) / 2) / 2); transform: translate(50%, -50%); }
+.series-side a:hover, .series-side a:focus-visible { color: var(--text); }
+/* On hover / keyboard focus a label slides out toward the page: "Previous series" + title
+   (2026-11-11). It may overlap a work while shown, so it has the page background. */
+.series-side .side-label {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: normal;
+  line-height: 1.3;
+  color: var(--text);
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+}
+.series-side .side-label .pager-title { font-size: 15px; }
+.series-side .side-prev .side-label { left: 100%; transform: translate(-6px, -50%); }
+.series-side .side-next .side-label { right: 100%; transform: translate(6px, -50%); align-items: flex-end; text-align: right; }
+.series-side a:hover .side-label,
+.series-side a:focus-visible .side-label { opacity: 1; transform: translate(0, -50%); }
+@media (max-width: 900px) { .series-side { display: none; } }
+
+/* Category page header */
+.category-header { margin: 40px 0 56px; }
+.category-header > * { max-width: var(--measure); }
+.category-header.count-1 { max-width: 1080px; margin-inline: auto; }   /* same box as the single cover */
+.category-header h1 { font-size: 22px; font-weight: var(--weight-title); margin: 0; line-height: 1.4; }
+.series-header h1 { font-size: 22px; font-weight: var(--weight-title); margin: 0; line-height: 1.4; }
+.series-sub { display: flex; gap: 12px; margin: 6px 0 0; font-size: 13px; }
+.statement { margin-top: 28px; }
+.statement p { margin: 0 0 1em; }
+
+.view-switch { display: flex; gap: 20px; margin-top: 36px; font-size: 13px; color: var(--muted); }
+.view-switch[hidden] { display: none; }   /* shown by gallery.js; without JS only the sequence exists */
+.view-switch button[aria-pressed="true"] { color: var(--text); text-decoration: underline; text-underline-offset: 6px; }
+
+/* Sequence: one work per screen (image ≤ 84vh plus generous spacing between works) */
+.sequence { display: grid; gap: 16vh; }
+@media (max-width: 700px) { .sequence { gap: 9vh; } }
+.work {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  scroll-margin-top: 6vh;
+}
+.work-link { display: block; width: 100%; cursor: zoom-in; }
+.work img { max-height: var(--work-max-h); width: auto; margin-inline: auto; }
+
+/* Equal area (html[data-size="area"]): width from the formula above, never wider
+   than the column and never taller than --work-max-h. --r / --sr come from build.py. */
+[data-size="area"] .work img {
+  width: min(100%, calc(var(--area-k) * var(--sr)), calc(var(--work-max-h) * var(--r)));
+  max-height: none;
+}
+/* Home page featured works: same equal-area rule on a smaller scale, so the first screen
+   is not filled by one photo (2026-11-10: was 84% of the screen height, now ≤ 62%). */
+[data-size="area"] .featured-work img {
+  --featured-k: min(54vh, var(--area-k));
+  --featured-max-h: 62vh;
+  width: min(100%, calc(var(--featured-k) * var(--sr)), calc(var(--featured-max-h) * var(--r)));
+  max-height: none;
+}
+.work figcaption { margin-top: 18px; font-size: 13px; text-align: center; line-height: 1.6; }
+.work figcaption .work-detail { display: block; font-size: 12px; }
+
+/* ---- Masonry (series index, series list with 3+ series) -----------------
+ * Every work keeps its original aspect ratio: fixed column widths, natural heights,
+ * nothing cropped. static/gallery.js deals items into the shortest column in order;
+ * without JS the CSS multi-column fallback below shows the same thing (column order).
+ */
+.masonry { --cols: 4; }
+/* Series grid view (목록 보기): equal-AREA brick rows (2026-11-11, operator request; first
+   tried equal-height rows, where a 3:4 portrait got only 56% of a 4:3 landscape's area).
+   Each row fills the width; every work in a row has the same area, so a portrait is about
+   1.3× taller than a landscape and a landscape about 1.3× wider. Flex basis and grow are both
+   ∝ √r, so widths stay ∝ √r while the row stretches (width·height = constant per row).
+   Works hang from a shared top line in their row (2026-11-11; tried centred, then bottom);
+   nothing is cropped; artist's order; no JS.
+   --row-h is the height a square work would have. The ::after filler keeps a short last
+   row at the target size. Browsers without CSS sqrt() fall back to equal-height rows. */
+.index-grid {
+  --row-h: clamp(110px, 24vw, 320px);
+  --gap: clamp(8px, 1.4vw, 20px);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;   /* top edges line up in each row */
+  gap: var(--gap);
+}
+.index-grid > .m-item { flex: calc(var(--r) * 100) 1 calc(var(--r) * var(--row-h)); min-width: 0; }
+.index-grid > .m-item { flex: calc(sqrt(var(--r)) * 100) 1 calc(sqrt(var(--r)) * var(--row-h)); }
+.index-grid::after { content: ""; flex: 100000 1 0; }   /* takes all spare space in the last row only */
+@media (max-width: 1100px) { .masonry { --cols: 3; } }
+@media (max-width: 700px)  { .masonry { --cols: 2; } }
+
+.masonry:not(.is-masonry) { column-count: var(--cols); column-gap: var(--gap); }
+.masonry:not(.is-masonry) > .m-item { break-inside: avoid; margin-bottom: var(--gap); }
+.masonry.is-masonry { display: flex; align-items: flex-start; gap: var(--gap); }
+.masonry-col { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: var(--gap); }
+.m-item { position: relative; }
+.m-item a { display: block; }
+.m-item img { width: 100%; height: auto; }
+/* Equal cells in grids (2026-11-11, operator request: mixed landscape/portrait looked uneven).
+   In the series 목록 보기 and the category page (2+ series) every work fits inside the same
+   square cell: its long edge equals the cell side, so a 4:3 landscape and a 3:4 portrait are
+   the same size turned 90°. The work is whole (never cropped) and centred in the cell both ways
+   (2026-11-11; it sat at the left before). The cell is the column width (cqw of
+   the container), so rows line up. Browsers without container queries show every work at
+   full column width, as before. */
+.series-grid:not(.count-1) .m-item { container-type: inline-size; }
+.series-grid:not(.count-1) .cover img {
+  width: min(100cqw, calc(100cqw * var(--r)));
+  margin-block: calc((100cqw - min(100cqw, calc(100cqw / var(--r)))) / 2);
+  margin-inline: auto;
+}
+.series-grid:not(.count-1) .cover { display: flow-root; }   /* keeps the cover's centring margins inside it, so title rows line up */
+.series-grid:not(.count-1) .cover img { height: auto; }
+/* The series title starts at the cover's left edge, not the cell's. */
+.series-grid:not(.count-1) .series-meta { padding-inline-start: calc((100cqw - min(100cqw, calc(100cqw * var(--r)))) / 2); }
+.index-grid .m-item > a { position: relative; }
+   /* the hover caption sits on the work, not the empty part of the cell */
+
+/* Index view of a series */
+.index-grid a { cursor: zoom-in; }
+.index-grid img { transition: opacity .2s ease; }
+.index-grid a:hover img { opacity: .85; }
+
+/* Titles: hidden until hover or keyboard focus, so the grid stays quiet */
+.index-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 18px 10px 8px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #fff;
+  background: linear-gradient(transparent, rgba(0, 0, 0, .55));
+  opacity: 0;
+  transition: opacity .2s ease;
+  pointer-events: none;
+}
+.index-grid a:hover .index-caption,
+.index-grid a:focus-visible .index-caption { opacity: 1; }
+
+.series[data-view="sequence"] .index-grid { display: none; }
+.series[data-view="index"] .sequence { display: none; }
+
+/* ---- Lightbox: one work, whole, at its original aspect ratio -------------- */
+
+.lightbox {
+  --lb-pad: clamp(12px, 3vw, 48px);
+  --lb-cap: 56px;                      /* room for the caption under the work */
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+.lightbox::backdrop { background: var(--bg); }
+.lightbox:focus { outline: none; }
+html.lb-open { overflow: hidden; }
+
+.lb-stage {
+  position: absolute;
+  inset: var(--lb-pad) var(--lb-pad) calc(var(--lb-pad) + var(--lb-cap));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Fit inside the stage in both directions; height follows from the ratio. */
+.lb-img {
+  width: min(100%, calc((100dvh - 2 * var(--lb-pad) - var(--lb-cap)) * var(--r, 1.5)));
+  height: auto;
+  max-height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.lb-caption {
+  position: absolute;
+  left: var(--lb-pad);
+  right: var(--lb-pad);
+  bottom: calc(var(--lb-pad) / 2);
+  height: var(--lb-cap);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+.lb-detail { font-size: 12px; color: var(--muted); }
+.lb-count { position: absolute; top: 14px; left: var(--lb-pad); margin: 0; font-size: 12px; color: var(--muted); }
+
+.lb-btn {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  line-height: 1;
+  color: var(--muted);
+}
+.lb-btn:hover { color: var(--text); }
+.lb-btn[hidden] { display: none; }
+.lb-close { top: 4px; right: 4px; font-size: 20px; }
+.lb-prev, .lb-next { top: 50%; transform: translateY(-50%); }
+.lb-prev { left: 0; }
+.lb-next { right: 0; }
+/* Touch screens swipe instead; arrows would sit on top of the work. */
+@media (hover: none) { .lb-prev, .lb-next { display: none; } }
+
+/* ---- About ------------------------------------------------------------ */
+
+.about { max-width: var(--measure); margin: 0 auto; padding-top: 40px; }   /* room the hidden title used to take */
+/* About text a little larger than the 15px body text (2026-11-10, operator request) */
+.about { font-size: 16px; }
+.about .prose { line-height: 1.8; }
+/* Hidden on screen, still read by screen readers and search engines */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.about .page-title { color: var(--text); font-size: 22px; font-weight: var(--weight-title); letter-spacing: 0; }
+.cv h2, .contact-block h2 {
+  font-size: 12px;
+  font-weight: var(--weight);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  margin: 56px 0 14px;
+}
+.cv dl { display: grid; grid-template-columns: 4.5em 1fr; gap: 8px 16px; margin: 0; }
+.cv dt { color: var(--muted); }
+.cv dd { margin: 0; }
+
+/* ---- Design switcher (preview build only) ------------------------------ */
+
+.design-switcher {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  padding: 10px 14px;
+  font: 12px/1.4 -apple-system, "Apple SD Gothic Neo", sans-serif;
+  letter-spacing: 0;
+  color: #222;
+  background: rgba(255, 255, 255, .92);
+  border: 1px solid rgba(0, 0, 0, .12);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, .15);
+  max-width: calc(100vw - 32px);
+}
+.ds-label { font-weight: 600; }
+.ds-group { display: flex; flex-wrap: wrap; border: 1px solid rgba(0, 0, 0, .15); border-radius: 6px; overflow: hidden; }
+.ds-group button { padding: 4px 10px; color: #444; }
+.ds-group button + button { border-left: 1px solid rgba(0, 0, 0, .15); }
+.ds-group button[aria-pressed="true"] { background: #222; color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  body, a { transition: none; }
+}
