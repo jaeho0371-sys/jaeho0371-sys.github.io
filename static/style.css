@@ -675,6 +675,37 @@ html.lb-open { overflow: hidden; }
 .cv dt { color: var(--muted); }
 .cv dd { margin: 0; }
 
+/* ---- News (F-26, 2026-11-13) ------------------------------------------ */
+
+.news { max-width: var(--measure); margin: 0 auto; padding-top: 40px; font-size: 16px; }
+.news-group + .news-group { margin-top: 56px; }
+/* Category headings in the same small, spaced capitals as the CV headings. */
+.news-heading {
+  font-size: 12px;
+  font-weight: var(--weight);
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0 0 14px;
+}
+.news-list { list-style: none; margin: 0; padding: 0; }
+.news-item {
+  display: grid;
+  grid-template-columns: 7em 1fr;
+  gap: 4px 16px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.news-item:last-child { border-bottom: 1px solid var(--line); }
+.news-date { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; font-variant-numeric: tabular-nums; }
+.news-title { margin: 0; font-size: 16px; font-weight: var(--weight-title); line-height: 1.6; }
+.news-title a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.news-title a:hover { text-decoration-color: currentColor; }
+.news .prose { margin-top: 6px; line-height: 1.8; color: var(--text); }
+.news .prose p { margin: 0 0 .6em; }
+.news .prose p:last-child { margin-bottom: 0; }
+@media (max-width: 560px) { .news-item { grid-template-columns: 1fr; } }
+
 /* ---- Design switcher (preview build only) ------------------------------ */
 
 .design-switcher {
