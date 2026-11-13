@@ -293,12 +293,103 @@ main { padding: 0 var(--gutter) 96px; }
 .featured-work[hidden] { display: none; }   /* one featured work on screen; the rest wait */
 .featured-work img { max-height: 62vh; width: auto; }   /* the first screen is not filled by one photo */
 
-/* Home slideshow button, under the featured works (only with 2+ of them; 2026-11-13). */
+/* Home slideshow = a "video screen" in place of the featured work (2026-11-13, operator
+   request). gallery.js removes `hidden` from every work and stacks them in one grid cell
+   (as tall as the tallest, so the page never jumps); only .is-current is visible. --r sizes
+   a deferred work's box before its image is loaded.
+   Dissolve (operator request, 2–3 s, site.yaml slideshow_dissolve → --dissolve): the new work
+   fades in on top while the old one stays almost full until late (ease-in curve), so the two
+   pictures blend into each other instead of dipping to the background in between. */
 .home-featured.has-slideshow { padding-bottom: 0; }
-.slideshow-start-wrap { text-align: center; margin: 3.5vh 0 10vh; }   /* gap above: 5vh → 3.5vh (operator request) */
-/* Slideshow buttons (2026-11-13, operator request): the icon alone, no shape around it,
-   in a tone close to the background; it turns to the text colour on hover/focus and dips
-   slightly when pressed. The 48×32 box is only the click/touch area. */
+.home-featured.is-player { grid-template-areas: "s"; gap: 0; }
+.home-featured.is-player .featured-work {
+  grid-area: s;
+  align-self: center;
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--dissolve, 2.5s) cubic-bezier(.7, 0, .9, .6),
+              visibility 0s linear var(--dissolve, 2.5s);
+}
+.home-featured.is-player .featured-work.is-current {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--dissolve, 2.5s) cubic-bezier(.4, 0, .4, 1);
+}
+.home-featured.is-player .featured-work img { aspect-ratio: var(--r); height: auto; }
+/* Home canvas (site.yaml home_canvas / home_bezel, 2026-11-13, operator request): the featured
+   work and the slideshow play inside a fixed-ratio screen with a slim bezel, so the frame never
+   changes size. Like the equal square cells, every work is fitted inside whole (the long side
+   meets the screen edge), centred, never cropped or stretched; the rest is the screen colour.
+   The section is a size container, so 100cqw / 100cqh are the inside of the screen. */
+.home-featured.has-canvas {
+  --bz: 4px;                                              /* bezel width */
+  --bz-pad: 0px;                                          /* mat between bezel and screen */
+  --bz-color: color-mix(in srgb, var(--text) 22%, var(--bg));
+  --bz-screen: color-mix(in srgb, var(--text) 5%, var(--bg));
+  --bz-radius: 6px;
+  --bz-shadow: none;
+  box-sizing: border-box;
+  width: min(100%, 1000px, calc(62vh * var(--canvas-r)));
+  aspect-ratio: var(--canvas-r);
+  margin: 2vh auto 10vh;
+  padding: var(--bz-pad);
+  border: var(--bz) solid var(--bz-color);
+  border-radius: var(--bz-radius);
+  background: var(--bz-screen);
+  box-shadow: var(--bz-shadow);
+  container-type: size;
+  overflow: hidden;
+  grid-template-areas: "s";
+  gap: 0;
+}
+.home-featured.has-canvas.has-slideshow { margin-bottom: 0; }
+.home-featured.has-canvas[data-bezel="monitor"] {
+  --bz: 6px;
+  --bz-color: #1c1c1e;
+  --bz-screen: #0d0d0e;
+  --bz-radius: 8px;
+  --bz-shadow: 0 8px 28px rgba(0, 0, 0, .18);
+}
+.home-featured.has-canvas[data-bezel="frame"] {
+  --bz: 1px;
+  --bz-pad: 14px;
+  --bz-color: var(--line);
+  --bz-screen: color-mix(in srgb, var(--text) 3%, var(--bg));
+  --bz-radius: 0;
+}
+.home-featured.has-canvas .featured-work {
+  grid-area: s;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.home-featured.has-canvas .featured-work img {
+  width: min(100cqw, calc(100cqh * var(--r)));
+  height: auto;
+  max-height: none;
+  aspect-ratio: var(--r);
+}
+.home-featured.has-canvas .featured-work[hidden] { display: none; }
+@media (max-width: 700px) {
+  .home-featured.has-canvas { --bz: 3px; }
+  .home-featured.has-canvas[data-bezel="frame"] { --bz: 1px; --bz-pad: 8px; }
+}
+
+.home-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  margin: 3.5vh 0 10vh;                /* gap above: 5vh → 3.5vh (operator request) */
+}
+.home-controls[hidden] { display: none; }
+/* Player keys (2026-11-13, operator request): the icon alone, no shape around it, in a tone
+   close to the background; it turns to the text colour on hover/focus and dips slightly when
+   pressed. The 48×32 box is only the click/touch area. */
 .key {
   width: 48px;
   height: 32px;                        /* clearly lower than wide (operator request) */
@@ -312,12 +403,16 @@ main { padding: 0 var(--gutter) 96px; }
 }
 .key:hover, .key:focus-visible { color: var(--text); }
 .key:active { transform: translateY(1px); }
-.key svg { width: 18px; height: 18px; }
+.key svg { width: 18px; height: 18px; fill: currentColor; }
 /* Play / Pause icons 1.5× the arrows (operator request), in a slightly taller box. */
-.slideshow-start, .lb-play { height: 40px; }
-.slideshow-start svg, .lb-play svg { width: 27px; height: 27px; }
-.slideshow-start[hidden] { display: none; }
-.slideshow-start svg { fill: currentColor; margin-left: 2px; }   /* optical centre of ▶ */
+.hc-play { height: 40px; }
+.hc-play svg { width: 27px; height: 27px; }
+.hc-play .icon-play { margin-left: 2px; }   /* optical centre of ▶ */
+.hc-play[data-state="playing"] .icon-play, .hc-play[data-state="paused"] .icon-pause { display: none; }
+.hc-mute[data-state="on"] .icon-muted, .hc-mute[data-state="off"] .icon-sound { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .home-featured.is-player .featured-work, .home-featured.is-player .featured-work.is-current { transition: none; }
+}
 
 .series-index { max-width: var(--measure); margin: 0 auto; }
 .index-category {
@@ -622,26 +717,6 @@ html.lb-open { overflow: hidden; }
 .lb-btn:hover { color: var(--text); }
 .lb-btn[hidden] { display: none; }
 .lb-close { top: 4px; right: 4px; font-size: 20px; }
-/* Slideshow: a control bar (‹ ❚❚/▶ ›) at the bottom centre, under the caption, in the
-   text colour so it is easy to see; the edge arrows are hidden meanwhile. Each work
-   fades in once it has loaded. */
-.lightbox.is-slideshow { --lb-cap: 120px; }
-.lightbox.is-slideshow .lb-caption { bottom: calc(var(--lb-pad) / 2 + 60px); height: 60px; }
-.lightbox.is-slideshow .lb-prev, .lightbox.is-slideshow .lb-next { display: none; }
-.lb-controls {
-  position: absolute;
-  left: 50%;
-  bottom: calc(var(--lb-pad) / 2);
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.lb-controls[hidden] { display: none; }
-.lb-play svg { fill: currentColor; }
-.lb-play[data-state="playing"] .icon-play, .lb-play[data-state="paused"] .icon-pause { display: none; }
-.lightbox.is-slideshow .lb-img { transition: opacity .9s ease; }
-.lightbox.is-slideshow .lb-img.lb-fading { opacity: 0; transition: none; }
 .lb-prev, .lb-next { top: 50%; transform: translateY(-50%); }
 .lb-prev { left: 0; }
 .lb-next { right: 0; }
@@ -735,5 +810,4 @@ html.lb-open { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   body, a { transition: none; }
-  .lightbox.is-slideshow .lb-img { transition: none; }
 }

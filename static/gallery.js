@@ -7,7 +7,8 @@
 //   2. View switch on series pages (크게 보기 / 목록 보기).
 //   3. Lightbox — a full-screen view of one work at its original aspect ratio,
 //                 with ←/→, Esc, swipe, and a #work-id URL for sharing.
-//                 On the home page the same viewer runs the featured works' slideshow.
+//   5. Home slideshow — with slideshow: true and 2+ featured works, the featured area plays
+//                 like a video screen: ▶/❚❚, ‹ ›, ←/→, swipe, optional music with 🔈.
 //   4. Contact e-mail — the About page carries the address reversed in two halves
 //                 (data-u / data-d) so harvesters never see it; this rebuilds the link.
 (function () {
@@ -132,11 +133,6 @@
   var prevBtn = dialog.querySelector(".lb-prev");
   var nextBtn = dialog.querySelector(".lb-next");
   var current = -1, opener = null;
-  // Home slideshow: the .slideshow-start button opens the lightbox and advances on a timer.
-  var startBtn = document.querySelector(".slideshow-start");
-  var controls = dialog.querySelector(".lb-controls");
-  var playBtn = dialog.querySelector(".lb-play");
-  var playing = false, timer = null, interval = 5000;
 
   if (works.length < 2) { prevBtn.hidden = true; nextBtn.hidden = true; }
 
@@ -151,10 +147,6 @@
   function show(i) {
     current = (i + works.length) % works.length;
     var w = works[current];
-    if (dialog.classList.contains("is-slideshow")) {
-      img.classList.add("lb-fading");    // fade in once the next work has loaded
-      img.onload = function () { img.classList.remove("lb-fading"); };
-    }
     img.removeAttribute("src");          // avoid flashing the previous work
     img.srcset = w.srcset;
     img.sizes = "100vw";
@@ -171,19 +163,6 @@
       var n = works[(j + works.length) % works.length];
       var pre = new Image(); pre.sizes = "100vw"; pre.srcset = n.srcset;
     });
-    if (img.complete) img.classList.remove("lb-fading");
-    schedule();                          // every step (timer or by hand) restarts the wait
-  }
-
-  function schedule() {
-    clearTimeout(timer);
-    if (playing && dialog.open) timer = setTimeout(function () { show(current + 1); }, interval);
-  }
-  function setPlaying(on) {
-    playing = on;
-    playBtn.dataset.state = on ? "playing" : "paused";   // CSS shows ❚❚ while playing, ▶ while paused
-    playBtn.setAttribute("aria-label", on ? "Pause slideshow" : "Play slideshow");
-    schedule();
   }
 
   function open(id, trigger) {
@@ -199,10 +178,6 @@
   }
 
   dialog.addEventListener("close", function () {
-    clearTimeout(timer);
-    playing = false;
-    dialog.classList.remove("is-slideshow");
-    controls.hidden = true;
     document.documentElement.classList.remove("lb-open");
     history.replaceState(null, "", location.pathname + location.search);
     if (opener) opener.focus();
@@ -214,29 +189,6 @@
     e.preventDefault();
     open(t.dataset.open, t);
   });
-
-  if (startBtn && works.length > 1) {
-    var listOrder = works.slice();
-    startBtn.hidden = false;
-    startBtn.addEventListener("click", function () {
-      interval = 1000 * (Number(startBtn.dataset.interval) || 5);
-      works = listOrder.slice();
-      if (startBtn.dataset.order === "random") {
-        for (var k = works.length - 1; k > 0; k--) {
-          var j = Math.floor(Math.random() * (k + 1)), t = works[k];
-          works[k] = works[j]; works[j] = t;
-        }
-      }
-      dialog.classList.add("is-slideshow");
-      controls.hidden = false;
-      playing = true;
-      open(works[0].id, startBtn);
-      setPlaying(true);
-    });
-    playBtn.addEventListener("click", function () { setPlaying(!playing); });
-    dialog.querySelector(".lb-c-prev").addEventListener("click", function () { show(current - 1); });
-    dialog.querySelector(".lb-c-next").addEventListener("click", function () { show(current + 1); });
-  }
 
   prevBtn.addEventListener("click", function () { show(current - 1); });
   nextBtn.addEventListener("click", function () { show(current + 1); });
@@ -276,3 +228,137 @@
   window.addEventListener("hashchange", openFromHash);
   openFromHash();
 })();
+
+// ------------------------------------------------------- Home slideshow player
+(function () {
+  "use strict";
+  var box = document.querySelector(".home-featured.has-slideshow");
+  var bar = document.querySelector(".home-controls");
+  if (!box || !bar) return;
+  var figs = Array.prototype.slice.call(box.querySelectorAll(".featured-work"));
+  if (figs.length < 2) return;
+  // What plays: the slideshow works (.is-slide) when the operator chose some, otherwise the
+  // featured works. The featured work on screen is where the screen starts either way.
+  var seq = figs.map(function (_, i) { return i; }).filter(function (i) { return figs[i].classList.contains("is-slide"); });
+  if (!seq.length) seq = figs.map(function (_, i) { return i; });
+
+  // slideshow_interval = how long a work is shown whole; the dissolve into the next one
+  // comes on top, so one turn is interval + dissolve (operator request, 2026-11-13).
+  var interval = 1000 * (Number(box.dataset.interval) || 5);
+  var dissolve = 1000 * (Number(box.dataset.dissolve) || 0);
+  var playBtn = bar.querySelector(".hc-play");
+  var muteBtn = bar.querySelector(".hc-mute");
+  var audio = document.querySelector(".slideshow-audio");
+  var playing = false, timer = null, order = [], pos = 0;
+
+  // The work already on screen (the first, or the random pick) is where playing starts.
+  var current = Math.max(0, figs.findIndex(function (f) { return !f.hidden; }));
+  function load(f) {
+    var img = f.querySelector("img");
+    if (img && img.dataset.src && !img.getAttribute("src")) { img.srcset = img.dataset.srcset; img.src = img.dataset.src; }
+  }
+  // Turn the area into the screen: every work in one cell, only the current one visible.
+  figs.forEach(function (f, i) { f.hidden = false; f.classList.toggle("is-current", i === current); });
+  box.classList.add("is-player");
+  bar.hidden = false;
+
+  function makeOrder() {          // the play sequence (from the work on screen, if it is in it)
+    var inSeq = seq.indexOf(current) >= 0;
+    order = seq.filter(function (i) { return i !== current; });
+    if (box.dataset.order === "random") {
+      for (var k = order.length - 1; k > 0; k--) {
+        var j = Math.floor(Math.random() * (k + 1)), t = order[k]; order[k] = order[j]; order[j] = t;
+      }
+    }
+    if (inSeq) order.unshift(current);
+    pos = 0;
+  }
+  makeOrder();
+
+  function show(i) {
+    current = i;
+    load(figs[i]);
+    figs.forEach(function (f, k) { f.classList.toggle("is-current", k === i); });
+    load(figs[order[(order.indexOf(i) + 1) % order.length]]);   // warm the next one (or the first)
+    schedule();
+  }
+  function step(d) {
+    var at = order.indexOf(current);   // -1 while the featured work (not in the show) is on screen
+    pos = at < 0 ? (d > 0 ? 0 : order.length - 1) : (at + d + order.length) % order.length;
+    show(order[pos]);
+  }
+  function schedule() {
+    clearTimeout(timer);
+    if (playing) timer = setTimeout(function () { step(1); }, dissolve + interval);
+  }
+
+  // ---- music: plays with the slideshow, fades in/out, follows Pause; 🔈 mutes (remembered)
+  var fadeTimer = null, audioRetried = false;
+  function fadeTo(target, ms, done) {
+    clearInterval(fadeTimer);
+    var from = audio.volume, t0 = Date.now();
+    fadeTimer = setInterval(function () {
+      var k = Math.min(1, (Date.now() - t0) / ms);
+      audio.volume = from + (target - from) * k;   // iOS ignores volume; play/pause still work
+      if (k >= 1) { clearInterval(fadeTimer); if (done) done(); }
+    }, 40);
+  }
+  function musicPlay() {
+    if (!audio) return;
+    var p = audio.play();
+    if (p && p.then) p.then(function () { fadeTo(1, 1200); }).catch(function () {});
+  }
+  function musicStop() { if (audio && !audio.paused) fadeTo(0, 500, function () { audio.pause(); }); }
+  function syncMute() {
+    muteBtn.dataset.state = audio.muted ? "off" : "on";
+    muteBtn.setAttribute("aria-label", audio.muted ? "Play music" : "Mute music");
+  }
+  if (audio && muteBtn) {
+    audio.volume = 0;
+    try { audio.muted = localStorage.getItem("slideshow-muted") === "1"; } catch (e) {}
+    syncMute();
+    muteBtn.addEventListener("click", function () {
+      audio.muted = !audio.muted;
+      try { localStorage.setItem("slideshow-muted", audio.muted ? "1" : "0"); } catch (e) {}
+      syncMute();
+    });
+    // A server without byte ranges (some local previews) can't stream audio to Safari;
+    // then load the whole file once and play it from memory.
+    audio.addEventListener("error", function () {
+      if (audioRetried) return;
+      audioRetried = true;
+      fetch(audio.src).then(function (r) { return r.blob(); }).then(function (b) {
+        audio.src = URL.createObjectURL(b);
+        if (playing) musicPlay();
+      }).catch(function () {});
+    });
+  }
+
+  function setPlaying(on) {
+    playing = on;
+    playBtn.dataset.state = on ? "playing" : "paused";   // CSS shows ❚❚ while playing, ▶ while paused
+    playBtn.setAttribute("aria-label", on ? "Pause slideshow" : "Play slideshow");
+    if (on) { seq.forEach(function (i) { load(figs[i]); }); musicPlay(); } else musicStop();
+    // From the featured work (not part of the show) go straight into the first slide.
+    if (on && order.indexOf(current) < 0) step(1); else schedule();
+  }
+
+  playBtn.addEventListener("click", function () { setPlaying(!playing); });
+  bar.querySelector(".hc-prev").addEventListener("click", function () { step(-1); });
+  bar.querySelector(".hc-next").addEventListener("click", function () { step(1); });
+  box.tabIndex = 0;              // ←/→ when the screen has focus
+  box.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") { e.preventDefault(); step(e.key === "ArrowRight" ? 1 : -1); }
+  });
+  var x0 = null;
+  box.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+  box.addEventListener("touchend", function (e) {
+    if (x0 === null) return;
+    var dx = e.changedTouches[0].clientX - x0;
+    x0 = null;
+    if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
+  });
+  // Stop when the page is left in the background, so music doesn't play on unseen.
+  document.addEventListener("visibilitychange", function () { if (document.hidden && playing) setPlaying(false); });
+})();
+

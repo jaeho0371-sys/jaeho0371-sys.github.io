@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;text=Jae%20Ho%20Song&amp;display=swap">
-<link rel="stylesheet" href="static/style.css?v=f50f907c22">
+<link rel="stylesheet" href="static/style.css?v=68f85788b6">
 </head>
 <body>
 <header class="site-header">
@@ -27,10 +27,22 @@
   </nav>
 </header>
 <main>
-<section class="home-featured has-slideshow">
+<section class="home-featured has-slideshow has-canvas" data-bezel="frame" aria-roledescription="slideshow" aria-label="Featured works"
+         data-interval="7" data-order="list"
+         data-dissolve="2.5" style="--dissolve: 2.5s;--canvas-r: 1.3333;">
   <figure class="featured-work">
     <img src="images/presence/dsf3418-1920.jpg"
-     srcset="images/presence/dsf3418-800.jpg 600w, images/presence/dsf3418-1600.jpg 1200w, images/presence/dsf3418-1920.jpg 1440w"
+srcset="images/presence/dsf3418-800.jpg 600w, images/presence/dsf3418-1600.jpg 1200w, images/presence/dsf3418-1920.jpg 1440w"
+     sizes="(max-width: 900px) 100vw, 85vw"
+     width="1440" height="1920"
+     alt="Presence: No.1"
+     style="background-color: #545a4b; --r: 0.7500; --sr: 0.8660"
+fetchpriority="high" decoding="async">
+
+  </figure>
+  <figure class="featured-work is-slide" hidden>
+    <img data-src="images/presence/dsf3418-1920.jpg"
+data-srcset="images/presence/dsf3418-800.jpg 600w, images/presence/dsf3418-1600.jpg 1200w, images/presence/dsf3418-1920.jpg 1440w"
      sizes="(max-width: 900px) 100vw, 85vw"
      width="1440" height="1920"
      alt="Presence: No.1"
@@ -38,9 +50,9 @@
 loading="lazy" decoding="async">
 
   </figure>
-  <figure class="featured-work" hidden>
-    <img src="images/afterglow/dsf4064-1920.jpg"
-     srcset="images/afterglow/dsf4064-800.jpg 800w, images/afterglow/dsf4064-1600.jpg 1600w, images/afterglow/dsf4064-1920.jpg 1920w"
+  <figure class="featured-work is-slide" hidden>
+    <img data-src="images/afterglow/dsf4064-1920.jpg"
+data-srcset="images/afterglow/dsf4064-800.jpg 800w, images/afterglow/dsf4064-1600.jpg 1600w, images/afterglow/dsf4064-1920.jpg 1920w"
      sizes="(max-width: 900px) 100vw, 85vw"
      width="1920" height="1440"
      alt="Afterglow: No.1"
@@ -48,46 +60,25 @@ loading="lazy" decoding="async">
 loading="lazy" decoding="async">
 
   </figure>
-  <figure class="featured-work" hidden>
-    <img src="images/incidental/dsf3350-1920.jpg"
-     srcset="images/incidental/dsf3350-800.jpg 600w, images/incidental/dsf3350-1600.jpg 1200w, images/incidental/dsf3350-1920.jpg 1440w"
+  <figure class="featured-work is-slide" hidden>
+    <img data-src="images/incidental/dsf3475-1920.jpg"
+data-srcset="images/incidental/dsf3475-800.jpg 600w, images/incidental/dsf3475-1600.jpg 1200w, images/incidental/dsf3475-1920.jpg 1440w"
      sizes="(max-width: 900px) 100vw, 85vw"
      width="1440" height="1920"
-     alt="Incidental: No.2"
-     style="background-color: #515245; --r: 0.7500; --sr: 0.8660"
+     alt="Incidental: No.1"
+     style="background-color: #576565; --r: 0.7500; --sr: 0.8660"
 loading="lazy" decoding="async">
 
   </figure>
 </section>
-<script>
-  (function () {
-    var f = document.querySelectorAll(".home-featured .featured-work");
-    var i = Math.floor(Math.random() * f.length);
-    if (i) { f[0].hidden = true; f[i].hidden = false; }
-  })();
-</script>
-<p class="slideshow-start-wrap">
-  <button type="button" class="key slideshow-start" hidden aria-label="Play slideshow" title="Slideshow"
-          data-interval="5" data-order="list">
-    <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
-  </button>
-</p>
-<dialog class="lightbox" aria-label="Work viewer" tabindex="-1">
-  <div class="lb-stage">
-    <img class="lb-img" alt="">
-  </div>
-  <p class="lb-caption" aria-live="polite"></p>
-  <p class="lb-count"></p>
-  <button type="button" class="lb-btn lb-close" aria-label="Close">✕</button>
-  <button type="button" class="lb-btn lb-prev" aria-label="Previous work">‹</button>
-  <button type="button" class="lb-btn lb-next" aria-label="Next work">›</button>
-  <div class="lb-controls" hidden>
-    <button type="button" class="key lb-c-prev" aria-label="Previous work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
-    <button type="button" class="key lb-play" aria-label="Pause slideshow" data-state="playing"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
-    <button type="button" class="key lb-c-next" aria-label="Next work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
-  </div>
-</dialog>
-<script type="application/json" id="works-data">[{"alt": "Presence: No.1", "edition": "", "h": 1920, "id": "dsf3418", "size": "", "src": "images/presence/dsf3418-1920.jpg", "srcset": "images/presence/dsf3418-800.jpg 600w, images/presence/dsf3418-1600.jpg 1200w, images/presence/dsf3418-1920.jpg 1440w", "title": "Presence: No.1", "w": 1440, "year": "2026"}, {"alt": "Afterglow: No.1", "edition": "", "h": 1440, "id": "dsf4064", "size": "", "src": "images/afterglow/dsf4064-1920.jpg", "srcset": "images/afterglow/dsf4064-800.jpg 800w, images/afterglow/dsf4064-1600.jpg 1600w, images/afterglow/dsf4064-1920.jpg 1920w", "title": "Afterglow: No.1", "w": 1920, "year": "2026"}, {"alt": "Incidental: No.2", "edition": "", "h": 1920, "id": "dsf3350", "size": "", "src": "images/incidental/dsf3350-1920.jpg", "srcset": "images/incidental/dsf3350-800.jpg 600w, images/incidental/dsf3350-1600.jpg 1200w, images/incidental/dsf3350-1920.jpg 1440w", "title": "Incidental: No.2", "w": 1440, "year": "2026"}]</script>
+<div class="home-controls" hidden>
+  <button type="button" class="key hc-prev" aria-label="Previous work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+  <button type="button" class="key hc-play" aria-label="Play slideshow" data-state="paused"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+  <button type="button" class="key hc-next" aria-label="Next work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+  <button type="button" class="key hc-mute" aria-label="Mute music" data-state="on"><svg class="icon-sound" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9.5l5 5M20.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
+</div>
+<audio class="slideshow-audio" src="media/slideshow-6648e02359.mp3" preload="none" loop></audio>
+
 <h1 class="home-name">Jae Ho Song</h1>
 
 <section class="series-index" aria-label="Works">
@@ -132,6 +123,6 @@ loading="lazy" decoding="async">
 <footer class="site-footer no-contact">
   <p>© 2026 Jae Ho Song. All rights reserved.</p>
 </footer>
-<script src="static/gallery.js?v=0035eec4c5" defer></script>
+<script src="static/gallery.js?v=7bb5bf4779" defer></script>
 </body>
 </html>
