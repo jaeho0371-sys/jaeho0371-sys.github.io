@@ -7,6 +7,7 @@
 //   2. View switch on series pages (크게 보기 / 목록 보기).
 //   3. Lightbox — a full-screen view of one work at its original aspect ratio,
 //                 with ←/→, Esc, swipe, and a #work-id URL for sharing.
+//                 On the home page the same viewer runs the featured works' slideshow.
 //   4. Contact e-mail — the About page carries the address reversed in two halves
 //                 (data-u / data-d) so harvesters never see it; this rebuilds the link.
 (function () {
@@ -131,6 +132,11 @@
   var prevBtn = dialog.querySelector(".lb-prev");
   var nextBtn = dialog.querySelector(".lb-next");
   var current = -1, opener = null;
+  // Home slideshow: the .slideshow-start button opens the lightbox and advances on a timer.
+  var startBtn = document.querySelector(".slideshow-start");
+  var controls = dialog.querySelector(".lb-controls");
+  var playBtn = dialog.querySelector(".lb-play");
+  var playing = false, timer = null, interval = 5000;
 
   if (works.length < 2) { prevBtn.hidden = true; nextBtn.hidden = true; }
 
@@ -145,6 +151,10 @@
   function show(i) {
     current = (i + works.length) % works.length;
     var w = works[current];
+    if (dialog.classList.contains("is-slideshow")) {
+      img.classList.add("lb-fading");    // fade in once the next work has loaded
+      img.onload = function () { img.classList.remove("lb-fading"); };
+    }
     img.removeAttribute("src");          // avoid flashing the previous work
     img.srcset = w.srcset;
     img.sizes = "100vw";
@@ -161,6 +171,19 @@
       var n = works[(j + works.length) % works.length];
       var pre = new Image(); pre.sizes = "100vw"; pre.srcset = n.srcset;
     });
+    if (img.complete) img.classList.remove("lb-fading");
+    schedule();                          // every step (timer or by hand) restarts the wait
+  }
+
+  function schedule() {
+    clearTimeout(timer);
+    if (playing && dialog.open) timer = setTimeout(function () { show(current + 1); }, interval);
+  }
+  function setPlaying(on) {
+    playing = on;
+    playBtn.dataset.state = on ? "playing" : "paused";   // CSS shows ❚❚ while playing, ▶ while paused
+    playBtn.setAttribute("aria-label", on ? "Pause slideshow" : "Play slideshow");
+    schedule();
   }
 
   function open(id, trigger) {
@@ -176,6 +199,10 @@
   }
 
   dialog.addEventListener("close", function () {
+    clearTimeout(timer);
+    playing = false;
+    dialog.classList.remove("is-slideshow");
+    controls.hidden = true;
     document.documentElement.classList.remove("lb-open");
     history.replaceState(null, "", location.pathname + location.search);
     if (opener) opener.focus();
@@ -187,6 +214,29 @@
     e.preventDefault();
     open(t.dataset.open, t);
   });
+
+  if (startBtn && works.length > 1) {
+    var listOrder = works.slice();
+    startBtn.hidden = false;
+    startBtn.addEventListener("click", function () {
+      interval = 1000 * (Number(startBtn.dataset.interval) || 5);
+      works = listOrder.slice();
+      if (startBtn.dataset.order === "random") {
+        for (var k = works.length - 1; k > 0; k--) {
+          var j = Math.floor(Math.random() * (k + 1)), t = works[k];
+          works[k] = works[j]; works[j] = t;
+        }
+      }
+      dialog.classList.add("is-slideshow");
+      controls.hidden = false;
+      playing = true;
+      open(works[0].id, startBtn);
+      setPlaying(true);
+    });
+    playBtn.addEventListener("click", function () { setPlaying(!playing); });
+    dialog.querySelector(".lb-c-prev").addEventListener("click", function () { show(current - 1); });
+    dialog.querySelector(".lb-c-next").addEventListener("click", function () { show(current + 1); });
+  }
 
   prevBtn.addEventListener("click", function () { show(current - 1); });
   nextBtn.addEventListener("click", function () { show(current + 1); });

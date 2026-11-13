@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;text=Jae%20Ho%20Song&amp;display=swap">
-<link rel="stylesheet" href="static/style.css?v=8b148dd6d0">
+<link rel="stylesheet" href="static/style.css?v=69d93c1297">
 </head>
 <body>
 <header class="site-header">
@@ -27,7 +27,7 @@
   </nav>
 </header>
 <main>
-<section class="home-featured">
+<section class="home-featured has-slideshow">
   <figure class="featured-work">
     <img src="images/presence/dsf3418-1920.jpg"
      srcset="images/presence/dsf3418-800.jpg 600w, images/presence/dsf3418-1600.jpg 1200w, images/presence/dsf3418-1920.jpg 1440w"
@@ -38,8 +38,49 @@
 fetchpriority="high" decoding="async">
 
   </figure>
-</section>
+  <figure class="featured-work" hidden>
+    <img src="images/afterglow/dsf4064-1920.jpg"
+     srcset="images/afterglow/dsf4064-800.jpg 800w, images/afterglow/dsf4064-1600.jpg 1600w, images/afterglow/dsf4064-1920.jpg 1920w"
+     sizes="(max-width: 900px) 100vw, 85vw"
+     width="1920" height="1440"
+     alt="Afterglow: No.1"
+     style="background-color: #3d4436; --r: 1.3333; --sr: 1.1547"
+loading="lazy" decoding="async">
 
+  </figure>
+  <figure class="featured-work" hidden>
+    <img src="images/incidental/dsf3350-1920.jpg"
+     srcset="images/incidental/dsf3350-800.jpg 600w, images/incidental/dsf3350-1600.jpg 1200w, images/incidental/dsf3350-1920.jpg 1440w"
+     sizes="(max-width: 900px) 100vw, 85vw"
+     width="1440" height="1920"
+     alt="Incidental: No.2"
+     style="background-color: #515245; --r: 0.7500; --sr: 0.8660"
+loading="lazy" decoding="async">
+
+  </figure>
+</section>
+<p class="slideshow-start-wrap">
+  <button type="button" class="key slideshow-start" hidden aria-label="Play slideshow" title="Slideshow"
+          data-interval="3" data-order="list">
+    <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>
+  </button>
+</p>
+<dialog class="lightbox" aria-label="Work viewer" tabindex="-1">
+  <div class="lb-stage">
+    <img class="lb-img" alt="">
+  </div>
+  <p class="lb-caption" aria-live="polite"></p>
+  <p class="lb-count"></p>
+  <button type="button" class="lb-btn lb-close" aria-label="Close">✕</button>
+  <button type="button" class="lb-btn lb-prev" aria-label="Previous work">‹</button>
+  <button type="button" class="lb-btn lb-next" aria-label="Next work">›</button>
+  <div class="lb-controls" hidden>
+    <button type="button" class="key lb-c-prev" aria-label="Previous work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+    <button type="button" class="key lb-play" aria-label="Pause slideshow" data-state="playing"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
+    <button type="button" class="key lb-c-next" aria-label="Next work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+  </div>
+</dialog>
+<script type="application/json" id="works-data">[{"alt": "Presence: No.1", "edition": "", "h": 1920, "id": "dsf3418", "size": "", "src": "images/presence/dsf3418-1920.jpg", "srcset": "images/presence/dsf3418-800.jpg 600w, images/presence/dsf3418-1600.jpg 1200w, images/presence/dsf3418-1920.jpg 1440w", "title": "Presence: No.1", "w": 1440, "year": "2026"}, {"alt": "Afterglow: No.1", "edition": "", "h": 1440, "id": "dsf4064", "size": "", "src": "images/afterglow/dsf4064-1920.jpg", "srcset": "images/afterglow/dsf4064-800.jpg 800w, images/afterglow/dsf4064-1600.jpg 1600w, images/afterglow/dsf4064-1920.jpg 1920w", "title": "Afterglow: No.1", "w": 1920, "year": "2026"}, {"alt": "Incidental: No.2", "edition": "", "h": 1920, "id": "dsf3350", "size": "", "src": "images/incidental/dsf3350-1920.jpg", "srcset": "images/incidental/dsf3350-800.jpg 600w, images/incidental/dsf3350-1600.jpg 1200w, images/incidental/dsf3350-1920.jpg 1440w", "title": "Incidental: No.2", "w": 1440, "year": "2026"}]</script>
 <h1 class="home-name">Jae Ho Song</h1>
 
 <section class="series-index" aria-label="Works">
@@ -84,6 +125,6 @@ fetchpriority="high" decoding="async">
 <footer class="site-footer no-contact">
   <p>© 2026 Jae Ho Song. All rights reserved.</p>
 </footer>
-<script src="static/gallery.js?v=5530de128f" defer></script>
+<script src="static/gallery.js?v=0035eec4c5" defer></script>
 </body>
 </html>

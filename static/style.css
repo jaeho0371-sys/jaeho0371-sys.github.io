@@ -290,7 +290,34 @@ main { padding: 0 var(--gutter) 96px; }
   white-space: nowrap;
 }
 .featured-work { margin: 0; display: flex; justify-content: center; }
+.featured-work[hidden] { display: none; }   /* one featured work on screen; the rest wait */
 .featured-work img { max-height: 62vh; width: auto; }   /* the first screen is not filled by one photo */
+
+/* Home slideshow button, under the featured works (only with 2+ of them; 2026-11-13). */
+.home-featured.has-slideshow { padding-bottom: 0; }
+.slideshow-start-wrap { text-align: center; margin: 3.5vh 0 10vh; }   /* gap above: 5vh → 3.5vh (operator request) */
+/* Slideshow buttons (2026-11-13, operator request): the icon alone, no shape around it,
+   in a tone close to the background; it turns to the text colour on hover/focus and dips
+   slightly when pressed. The 48×32 box is only the click/touch area. */
+.key {
+  width: 48px;
+  height: 32px;                        /* clearly lower than wide (operator request) */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--text) 55%, var(--bg));   /* icon in the background's tone */
+  background: none;
+  border: 0;
+  transition: color .15s, transform .1s;
+}
+.key:hover, .key:focus-visible { color: var(--text); }
+.key:active { transform: translateY(1px); }
+.key svg { width: 18px; height: 18px; }
+/* Play / Pause icons 1.5× the arrows (operator request), in a slightly taller box. */
+.slideshow-start, .lb-play { height: 40px; }
+.slideshow-start svg, .lb-play svg { width: 27px; height: 27px; }
+.slideshow-start[hidden] { display: none; }
+.slideshow-start svg { fill: currentColor; margin-left: 2px; }   /* optical centre of ▶ */
 
 .series-index { max-width: var(--measure); margin: 0 auto; }
 .index-category {
@@ -595,6 +622,26 @@ html.lb-open { overflow: hidden; }
 .lb-btn:hover { color: var(--text); }
 .lb-btn[hidden] { display: none; }
 .lb-close { top: 4px; right: 4px; font-size: 20px; }
+/* Slideshow: a control bar (‹ ❚❚/▶ ›) at the bottom centre, under the caption, in the
+   text colour so it is easy to see; the edge arrows are hidden meanwhile. Each work
+   fades in once it has loaded. */
+.lightbox.is-slideshow { --lb-cap: 120px; }
+.lightbox.is-slideshow .lb-caption { bottom: calc(var(--lb-pad) / 2 + 60px); height: 60px; }
+.lightbox.is-slideshow .lb-prev, .lightbox.is-slideshow .lb-next { display: none; }
+.lb-controls {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--lb-pad) / 2);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.lb-controls[hidden] { display: none; }
+.lb-play svg { fill: currentColor; }
+.lb-play[data-state="playing"] .icon-play, .lb-play[data-state="paused"] .icon-pause { display: none; }
+.lightbox.is-slideshow .lb-img { transition: opacity .9s ease; }
+.lightbox.is-slideshow .lb-img.lb-fading { opacity: 0; transition: none; }
 .lb-prev, .lb-next { top: 50%; transform: translateY(-50%); }
 .lb-prev { left: 0; }
 .lb-next { right: 0; }
@@ -657,4 +704,5 @@ html.lb-open { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   body, a { transition: none; }
+  .lightbox.is-slideshow .lb-img { transition: none; }
 }
