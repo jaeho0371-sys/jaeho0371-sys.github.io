@@ -246,13 +246,17 @@
   // comes on top, so one turn is interval + dissolve (operator request, 2026-11-13).
   var interval = 1000 * (Number(box.dataset.interval) || 5);
   var dissolve = 1000 * (Number(box.dataset.dissolve) || 0);
+  // Rounds to play before going back to the featured work and stopping; 0 = keep going.
+  var rounds = Number(box.dataset.rounds || 1), roundsDone = 0;
   var playBtn = bar.querySelector(".hc-play");
+  var stopBtn = bar.querySelector(".hc-stop");
   var muteBtn = bar.querySelector(".hc-mute");
   var audio = document.querySelector(".slideshow-audio");
   var playing = false, timer = null, order = [], pos = 0;
 
   // The work already on screen (the first, or the random pick) is where playing starts.
   var current = Math.max(0, figs.findIndex(function (f) { return !f.hidden; }));
+  var home = current;            // the featured work ■ returns to
   function load(f) {
     var img = f.querySelector("img");
     if (img && img.dataset.src && !img.getAttribute("src")) { img.srcset = img.dataset.srcset; img.src = img.dataset.src; }
@@ -280,8 +284,10 @@
     load(figs[i]);
     figs.forEach(function (f, k) { f.classList.toggle("is-current", k === i); });
     load(figs[order[(order.indexOf(i) + 1) % order.length]]);   // warm the next one (or the first)
+    syncStop();
     schedule();
   }
+  function syncStop() { if (stopBtn) stopBtn.hidden = !(playing || current !== home); }
   function step(d) {
     var at = order.indexOf(current);   // -1 while the featured work (not in the show) is on screen
     pos = at < 0 ? (d > 0 ? 0 : order.length - 1) : (at + d + order.length) % order.length;
@@ -289,7 +295,19 @@
   }
   function schedule() {
     clearTimeout(timer);
-    if (playing) timer = setTimeout(function () { step(1); }, dissolve + interval);
+    if (playing) timer = setTimeout(advance, dissolve + interval);
+  }
+  function advance() {             // the timer's step; after the set number of rounds, go home
+    if (order.indexOf(current) === order.length - 1 && ++roundsDone >= rounds && rounds > 0) toHome();
+    else step(1);
+  }
+  // ■ (and the end of a round): dissolve back to the featured work, stop, and start over next time.
+  function toHome() {
+    roundsDone = 0;
+    setPlaying(false, true);
+    show(home);
+    makeOrder();                    // a new shuffle for the next ▶ when the order is random
+    syncStop();
   }
 
   // ---- music: plays with the slideshow, fades in/out, follows Pause; 🔈 mutes (remembered)
@@ -308,7 +326,11 @@
     var p = audio.play();
     if (p && p.then) p.then(function () { fadeTo(1, 1200); }).catch(function () {});
   }
-  function musicStop() { if (audio && !audio.paused) fadeTo(0, 500, function () { audio.pause(); }); }
+  function musicStop(rewind) {     // rewind: the next ▶ starts the music from the beginning
+    if (!audio) return;
+    var done = function () { audio.pause(); if (rewind) try { audio.currentTime = 0; } catch (e) {} };
+    if (audio.paused) done(); else fadeTo(0, rewind ? 900 : 500, done);
+  }
   function syncMute() {
     muteBtn.dataset.state = audio.muted ? "off" : "on";
     muteBtn.setAttribute("aria-label", audio.muted ? "Play music" : "Mute music");
@@ -334,16 +356,21 @@
     });
   }
 
-  function setPlaying(on) {
+  function setPlaying(on, rewind) {
     playing = on;
     playBtn.dataset.state = on ? "playing" : "paused";   // CSS shows ❚❚ while playing, ▶ while paused
     playBtn.setAttribute("aria-label", on ? "Pause slideshow" : "Play slideshow");
-    if (on) { seq.forEach(function (i) { load(figs[i]); }); musicPlay(); } else musicStop();
+    if (on) { seq.forEach(function (i) { load(figs[i]); }); musicPlay(); } else musicStop(rewind);
+    syncStop();
     // From the featured work (not part of the show) go straight into the first slide.
     if (on && order.indexOf(current) < 0) step(1); else schedule();
   }
 
   playBtn.addEventListener("click", function () { setPlaying(!playing); });
+  if (stopBtn) stopBtn.addEventListener("click", function () {
+    toHome();
+    playBtn.focus();               // the ■ key disappears; keep the keyboard focus nearby
+  });
   bar.querySelector(".hc-prev").addEventListener("click", function () { step(-1); });
   bar.querySelector(".hc-next").addEventListener("click", function () { step(1); });
   box.tabIndex = 0;              // ←/→ when the screen has focus

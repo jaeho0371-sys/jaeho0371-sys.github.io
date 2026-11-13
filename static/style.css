@@ -352,13 +352,73 @@ main { padding: 0 var(--gutter) 96px; }
   --bz-radius: 8px;
   --bz-shadow: 0 8px 28px rgba(0, 0, 0, .18);
 }
+/* B. Gallery frame (revised 2026-11-13, operator request): a flat mat board laid on the wall — no
+   outline, no shadow; just a mat a shade lighter than the wall (5% white) with a faint paper grain.
+   (Tried the same day and turned down: a hairline outline, a 22% lighter mat, shadows.) */
 .home-featured.has-canvas[data-bezel="frame"] {
-  --bz: 1px;
+  --bz: 0px;
   --bz-pad: 14px;
-  --bz-color: var(--line);
-  --bz-screen: color-mix(in srgb, var(--text) 3%, var(--bg));
-  --bz-radius: 0;
+  --bz-screen: color-mix(in srgb, var(--bg) 95%, #fff);
+  --bz-radius: 1px;
+  --bz-shadow: none;
+  position: relative;
+  isolation: isolate;                    /* keeps the grain layer under the works */
 }
+/* D. Frosted glass (2026-11-13, operator request; strengthened the same day): the mat is
+   see-through — the wall shows through it — with the mat's fine grain, a sheen that is brightest
+   at the top-left, one soft diagonal streak of light, light caught along the top and left edges
+   and a faint inner glow. No dark outline and no drop shadow. */
+.home-featured.has-canvas[data-bezel="glass"] {
+  --bz: 0px;
+  --bz-pad: 14px;
+  --bz-screen: color-mix(in srgb, var(--text) 2%, var(--bg));   /* 2% off the wall, so the glass reads as a pane (operator request) */
+  --bz-radius: 3px;
+  --bz-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), inset 1px 0 0 rgba(255, 255, 255, .3),
+               inset 0 0 22px rgba(255, 255, 255, .16);
+  position: relative;
+  isolation: isolate;
+  background-image:
+    linear-gradient(118deg, transparent 16%, rgba(255, 255, 255, .16) 23%, rgba(255, 255, 255, .04) 30%, transparent 36%),
+    linear-gradient(155deg, rgba(255, 255, 255, .38) 0%, rgba(255, 255, 255, .13) 36%,
+                            rgba(255, 255, 255, .05) 62%, rgba(255, 255, 255, .14) 100%);
+}
+/* E. Glass with a chrome rim (2026-11-13, operator request): the frosted glass above, held in a
+   thin polished-metal rim — a 2.5px border painted with bright and dark silver bands (the glass
+   layers are clipped to the padding box, the metal to the border box) and a tiny contact shadow. */
+.home-featured.has-canvas[data-bezel="chrome"] {
+  --bz: 2.5px;
+  --bz-pad: 14px;
+  --bz-color: transparent;
+  --bz-radius: 4px;
+  --bz-shadow: inset 0 1px 0 rgba(255, 255, 255, .55), inset 0 0 22px rgba(255, 255, 255, .14),
+               0 1px 2px rgba(0, 0, 0, .14), 0 3px 10px -4px rgba(0, 0, 0, .12);
+  position: relative;
+  isolation: isolate;
+  background:
+    linear-gradient(118deg, transparent 16%, rgba(255, 255, 255, .16) 23%, rgba(255, 255, 255, .04) 30%, transparent 36%) padding-box,
+    linear-gradient(155deg, rgba(255, 255, 255, .38) 0%, rgba(255, 255, 255, .13) 36%,
+                            rgba(255, 255, 255, .05) 62%, rgba(255, 255, 255, .14) 100%) padding-box,
+    linear-gradient(color-mix(in srgb, var(--text) 2%, var(--bg)), color-mix(in srgb, var(--text) 2%, var(--bg))) padding-box,
+                                                           /* under the glass: 2% off the wall; hides the metal except in the rim */
+    linear-gradient(135deg, #f7f7f7 0%, #a4a4a4 18%, #fdfdfd 34%, #7d7d7d 52%, #e6e6e6 68%,
+                            #8f8f8f 84%, #f4f4f4 100%) border-box;
+}
+/* Paper grain: a tiny tiled noise, multiplied very lightly over the mat (no image file). */
+.home-featured.has-canvas[data-bezel="chrome"]::before,
+.home-featured.has-canvas[data-bezel="glass"]::before,
+.home-featured.has-canvas[data-bezel="frame"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  mix-blend-mode: multiply;
+  opacity: .22;
+}
+.home-featured.has-canvas[data-bezel="glass"]::before,
+.home-featured.has-canvas[data-bezel="chrome"]::before { opacity: .16; }
 .home-featured.has-canvas .featured-work {
   grid-area: s;
   min-width: 0;
@@ -376,7 +436,9 @@ main { padding: 0 var(--gutter) 96px; }
 .home-featured.has-canvas .featured-work[hidden] { display: none; }
 @media (max-width: 700px) {
   .home-featured.has-canvas { --bz: 3px; }
-  .home-featured.has-canvas[data-bezel="frame"] { --bz: 1px; --bz-pad: 8px; }
+  .home-featured.has-canvas[data-bezel="frame"] { --bz: 0px; --bz-pad: 8px; }
+  .home-featured.has-canvas[data-bezel="glass"], .home-featured.has-canvas[data-bezel="chrome"] { --bz-pad: 8px; }
+  .home-featured.has-canvas[data-bezel="chrome"] { --bz: 2px; }
 }
 
 .home-controls {
@@ -401,6 +463,7 @@ main { padding: 0 var(--gutter) 96px; }
   border: 0;
   transition: color .15s, transform .1s;
 }
+.key[hidden] { display: none; }
 .key:hover, .key:focus-visible { color: var(--text); }
 .key:active { transform: translateY(1px); }
 .key svg { width: 18px; height: 18px; fill: currentColor; }
@@ -774,12 +837,31 @@ html.lb-open { overflow: hidden; }
 .news-item:last-child { border-bottom: 1px solid var(--line); }
 .news-date { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.7; font-variant-numeric: tabular-nums; }
 .news-title { margin: 0; font-size: 16px; font-weight: var(--weight-title); line-height: 1.6; }
-.news-title a { text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
-.news-title a:hover { text-decoration-color: currentColor; }
+/* Link titles: a clearly visible underline (the --line colour was too faint; operator request
+   2026-11-13) that turns to the full text colour on hover. */
+.news-title a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--text) 55%, var(--bg));
+  text-underline-offset: 4px;
+  transition: text-decoration-color .15s;
+}
+.news-title a:hover, .news-title a:focus-visible { text-decoration-color: currentColor; }
 .news .prose { margin-top: 6px; line-height: 1.8; color: var(--text); }
 .news .prose p { margin: 0 0 .6em; }
 .news .prose p:last-child { margin-bottom: 0; }
-@media (max-width: 560px) { .news-item { grid-template-columns: 1fr; } }
+/* Promotional image beside the text (2026-11-13): ~180px, whole and uncropped (its own ratio),
+   opens in the lightbox. On phones it goes under the text. */
+.news-item.has-image { grid-template-columns: 7em 1fr 180px; }
+.news-image { display: block; align-self: start; cursor: zoom-in; }
+.news-image.is-link { cursor: pointer; }
+.news-image img { display: block; width: 100%; height: auto; }
+.news-image:hover img { opacity: .9; }
+@media (max-width: 760px) { .news-item.has-image { grid-template-columns: 7em 1fr 120px; } }
+@media (max-width: 560px) {
+  .news-item, .news-item.has-image { grid-template-columns: 1fr; }
+  .news-image { width: min(70vw, 280px); margin-top: 8px; }
+}
 
 /* ---- Design switcher (preview build only) ------------------------------ */
 

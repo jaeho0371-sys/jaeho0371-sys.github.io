@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&amp;text=Jae%20Ho%20Song&amp;display=swap">
-<link rel="stylesheet" href="static/style.css?v=68f85788b6">
+<link rel="stylesheet" href="static/style.css?v=c1aec6fcdb">
 </head>
 <body>
 <header class="site-header">
@@ -27,9 +27,9 @@
   </nav>
 </header>
 <main>
-<section class="home-featured has-slideshow has-canvas" data-bezel="frame" aria-roledescription="slideshow" aria-label="Featured works"
+<section class="home-featured has-slideshow has-canvas" data-bezel="glass" aria-roledescription="slideshow" aria-label="Featured works"
          data-interval="7" data-order="list"
-         data-dissolve="2.5" style="--dissolve: 2.5s;--canvas-r: 1.3333;">
+         data-dissolve="2.5" data-rounds="0" style="--dissolve: 2.5s;--canvas-r: 1.0000;">
   <figure class="featured-work">
     <img src="images/presence/dsf3418-1920.jpg"
 srcset="images/presence/dsf3418-800.jpg 600w, images/presence/dsf3418-1600.jpg 1200w, images/presence/dsf3418-1920.jpg 1440w"
@@ -75,6 +75,7 @@ loading="lazy" decoding="async">
   <button type="button" class="key hc-prev" aria-label="Previous work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
   <button type="button" class="key hc-play" aria-label="Play slideshow" data-state="paused"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg></button>
   <button type="button" class="key hc-next" aria-label="Next work"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button>
+  <button type="button" class="key hc-stop" aria-label="Back to the featured work" title="Back to the featured work" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 7.5h9v9h-9z"/></svg></button>
   <button type="button" class="key hc-mute" aria-label="Mute music" data-state="on"><svg class="icon-sound" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="currentColor" stroke-width="1.6"/></svg><svg class="icon-muted" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9.5l5 5M20.5 9.5l-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg></button>
 </div>
 <audio class="slideshow-audio" src="media/slideshow-6648e02359.mp3" preload="none" loop></audio>
@@ -123,6 +124,6 @@ loading="lazy" decoding="async">
 <footer class="site-footer no-contact">
   <p>© 2026 Jae Ho Song. All rights reserved.</p>
 </footer>
-<script src="static/gallery.js?v=7bb5bf4779" defer></script>
+<script src="static/gallery.js?v=5ca25f1e66" defer></script>
 </body>
 </html>
