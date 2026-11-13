@@ -387,16 +387,18 @@ main { padding: 0 var(--gutter) 96px; }
 .home-featured.has-canvas[data-bezel="glass"] {
   --bz: 0px;
   --bz-pad: 14px;
-  --bz-screen: color-mix(in srgb, var(--text) 2%, var(--bg));   /* 2% off the wall, so the glass reads as a pane (operator request) */
+  --bz-screen: color-mix(in srgb, var(--text) 1%, var(--bg));   /* 1% off the wall: a pane, close to the wall's tone (operator request; was 2%) */
   --bz-radius: 3px;
-  --bz-shadow: inset 0 1px 0 rgba(255, 255, 255, .6), inset 1px 0 0 rgba(255, 255, 255, .3),
-               inset 0 0 22px rgba(255, 255, 255, .16);
+  /* With the pane only 1% off the wall, the sheen and the edge light carry the glass, so both
+     were raised a little (operator request, 2026-11-13). */
+  --bz-shadow: inset 0 1px 0 rgba(255, 255, 255, .8), inset 1px 0 0 rgba(255, 255, 255, .45),
+               inset 0 -1px 0 rgba(255, 255, 255, .18), inset 0 0 24px rgba(255, 255, 255, .22);
   position: relative;
   isolation: isolate;
   background-image:
-    linear-gradient(118deg, transparent 16%, rgba(255, 255, 255, .16) 23%, rgba(255, 255, 255, .04) 30%, transparent 36%),
-    linear-gradient(155deg, rgba(255, 255, 255, .38) 0%, rgba(255, 255, 255, .13) 36%,
-                            rgba(255, 255, 255, .05) 62%, rgba(255, 255, 255, .14) 100%);
+    linear-gradient(118deg, transparent 16%, rgba(255, 255, 255, .22) 23%, rgba(255, 255, 255, .05) 30%, transparent 36%),
+    linear-gradient(155deg, rgba(255, 255, 255, .48) 0%, rgba(255, 255, 255, .17) 36%,
+                            rgba(255, 255, 255, .06) 62%, rgba(255, 255, 255, .17) 100%);
 }
 /* E. Glass with a chrome rim (2026-11-13, operator request): the frosted glass above, held in a
    thin polished-metal rim — a 2.5px border painted with bright and dark silver bands (the glass
@@ -414,12 +416,15 @@ main { padding: 0 var(--gutter) 96px; }
     linear-gradient(118deg, transparent 16%, rgba(255, 255, 255, .16) 23%, rgba(255, 255, 255, .04) 30%, transparent 36%) padding-box,
     linear-gradient(155deg, rgba(255, 255, 255, .38) 0%, rgba(255, 255, 255, .13) 36%,
                             rgba(255, 255, 255, .05) 62%, rgba(255, 255, 255, .14) 100%) padding-box,
-    linear-gradient(color-mix(in srgb, var(--text) 2%, var(--bg)), color-mix(in srgb, var(--text) 2%, var(--bg))) padding-box,
-                                                           /* under the glass: 2% off the wall; hides the metal except in the rim */
+    linear-gradient(color-mix(in srgb, var(--text) 1%, var(--bg)), color-mix(in srgb, var(--text) 1%, var(--bg))) padding-box,
+                                                           /* under the glass: 1% off the wall; hides the metal except in the rim */
     linear-gradient(135deg, #f7f7f7 0%, #a4a4a4 18%, #fdfdfd 34%, #7d7d7d 52%, #e6e6e6 68%,
                             #8f8f8f 84%, #f4f4f4 100%) border-box;
 }
-/* Paper grain: a tiny tiled noise, multiplied very lightly over the mat (no image file). */
+/* Paper (2026-11-13; given more of a paper feel at the operator's request): three tiled noises,
+   multiplied very lightly over the mat — a fine grain, short fibres (noise stretched along one
+   axis, in two directions) and a soft large-scale mottle, as in mould-made paper. No image files.
+   (A hanji version with long fibres and laid lines was tried and turned down the same day.) */
 .home-featured.has-canvas[data-bezel="chrome"]::before,
 .home-featured.has-canvas[data-bezel="glass"]::before,
 .home-featured.has-canvas[data-bezel="frame"]::before {
@@ -428,8 +433,12 @@ main { padding: 0 var(--gutter) 96px; }
   inset: 0;
   z-index: -1;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' seed='1' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.012 0.42' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .45 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.42 0.012' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='420' height='420'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.011' numOctaves='3' seed='4' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px, 260px 260px, 260px 260px, 420px 420px;
   mix-blend-mode: multiply;
   opacity: .22;
 }
@@ -604,7 +613,14 @@ main { padding: 0 var(--gutter) 96px; }
 .category-header { margin: 40px 0 56px; }
 .category-header > * { max-width: var(--measure); }
 .category-header.count-1 { max-width: 1080px; margin-inline: auto; }   /* same box as the single cover */
-.category-header h1 { font-size: 22px; font-weight: var(--weight-title); margin: 0; line-height: 1.4; }
+.category-header h1 {
+  font-size: 22px;
+  font-weight: var(--weight);                                  /* regular, not the title weight */
+  color: color-mix(in srgb, var(--text) 72%, var(--bg));       /* a softer ink (operator request, 2026-11-13) */
+  letter-spacing: .01em;
+  margin: 0;
+  line-height: 1.4;
+}
 .series-header h1 { font-size: 22px; font-weight: var(--weight-title); margin: 0; line-height: 1.4; }
 .series-sub { display: flex; gap: 12px; margin: 6px 0 0; font-size: 13px; }
 .statement { margin-top: 28px; }
@@ -869,21 +885,25 @@ html.lb-open { overflow: hidden; }
 /* Status and 지난 소식 (2026-11-13, operator request). The label sits under the date; ended
    news moves below a 지난 소식 heading, dimmed, with a smaller image. */
 .news-date time { display: block; }
+/* Status (operator request, 2026-11-13: the filled black pill was too heavy): plain small text;
+   진행 중 is in the text colour with a small dot before it, 예정 / 종료 are muted with no dot. */
 .news-status {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-top: 6px;
-  padding: 1px 8px;
-  font-size: 11px;
+  font-size: 11.5px;
   line-height: 1.6;
   letter-spacing: .02em;
-  border-radius: 999px;
   color: var(--muted);
-  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
 }
-.news-item[data-status="current"] .news-status {
-  color: var(--bg);
-  background: var(--text);
-  border-color: var(--text);
+.news-item[data-status="current"] .news-status { color: var(--text); }
+.news-item[data-status="current"] .news-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
 }
 .news-past-heading {
   margin: 40px 0 10px;

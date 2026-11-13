@@ -248,7 +248,8 @@
   // comes on top, so one turn is interval + dissolve (operator request, 2026-11-13).
   var interval = 1000 * (Number(box.dataset.interval) || 5);
   var dissolve = 1000 * (Number(box.dataset.dissolve) || 0);
-  // Rounds to play before going back to the featured work and stopping; 0 = keep going.
+  // Rounds to play before going back to the featured work and stopping; 0 = keep going;
+  // -1 = keep going until the music ends (it plays once), then go back (operator request).
   var rounds = Number(box.dataset.rounds || 1), roundsDone = 0;
   var playBtn = bar.querySelector(".hc-play");
   var stopBtn = bar.querySelector(".hc-stop");
@@ -300,7 +301,7 @@
     if (playing) timer = setTimeout(advance, dissolve + interval);
   }
   function advance() {             // the timer's step; after the set number of rounds, go home
-    if (order.indexOf(current) === order.length - 1 && ++roundsDone >= rounds && rounds > 0) toHome();
+    if (order.indexOf(current) === order.length - 1 && ++roundsDone >= rounds && rounds > 0) toHome();   // -1/0: never here
     else step(1);
   }
   // ■ (and the end of a round): dissolve back to the featured work, stop, and start over next time.
@@ -326,7 +327,8 @@
   function musicPlay() {
     if (!audio) return;
     var p = audio.play();
-    if (p && p.then) p.then(function () { fadeTo(1, 1200); }).catch(function () {});
+    // A slow fade-in (2.8 s), so the first chords come in quietly (operator request).
+    if (p && p.then) p.then(function () { fadeTo(1, 2800); }).catch(function () {});
   }
   function musicStop(rewind) {     // rewind: the next ▶ starts the music from the beginning
     if (!audio) return;
@@ -346,6 +348,9 @@
       try { localStorage.setItem("slideshow-muted", audio.muted ? "1" : "0"); } catch (e) {}
       syncMute();
     });
+    // "Until the music ends": when the piece finishes, the screen dissolves back to the featured
+    // work and stops, the last chord still sounding.
+    audio.addEventListener("ended", function () { if (rounds === -1 && playing) toHome(); });
     // A server without byte ranges (some local previews) can't stream audio to Safari;
     // then load the whole file once and play it from memory.
     audio.addEventListener("error", function () {
