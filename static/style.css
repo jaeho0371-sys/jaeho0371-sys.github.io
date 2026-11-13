@@ -252,20 +252,22 @@ button {
 .site-header nav a:hover { color: var(--text); }
 .site-header nav a[aria-current="page"] { color: var(--text); }
 /* Phones (2026-11-13, operator request: About dropped to a second line): the menu takes its own
-   full-width line under the name and never wraps — the items are spread across the width, a
-   little smaller; on very narrow screens the line scrolls sideways instead of breaking. */
+   full-width line under the name and never wraps — right-aligned (spreading it edge to edge
+   looked loose), a little smaller; on very narrow screens the line scrolls sideways instead of
+   breaking. The first item's auto margin does the right alignment, because flex-end would cut
+   off the start of an overflowing line where it can't be scrolled to. */
 @media (max-width: 600px) {
   .site-header { row-gap: 14px; }
   .site-header nav {
     width: 100%;
     flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: 0 14px;
+    gap: 0 18px;
     font-size: 12.5px;
     white-space: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
   }
+  .site-header nav > :first-child { margin-left: auto; }
   .site-header nav::-webkit-scrollbar { display: none; }
 }
 
