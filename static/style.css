@@ -251,7 +251,23 @@ button {
 .site-header nav { display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 13px; color: var(--muted); }
 .site-header nav a:hover { color: var(--text); }
 .site-header nav a[aria-current="page"] { color: var(--text); }
-@media (max-width: 600px) { .site-header nav { gap: 8px 18px; } }
+/* Phones (2026-11-13, operator request: About dropped to a second line): the menu takes its own
+   full-width line under the name and never wraps — the items are spread across the width, a
+   little smaller; on very narrow screens the line scrolls sideways instead of breaking. */
+@media (max-width: 600px) {
+  .site-header { row-gap: 14px; }
+  .site-header nav {
+    width: 100%;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 0 14px;
+    font-size: 12.5px;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .site-header nav::-webkit-scrollbar { display: none; }
+}
 
 main { padding: 0 var(--gutter) 96px; }
 
@@ -850,6 +866,38 @@ html.lb-open { overflow: hidden; }
 .news .prose { margin-top: 6px; line-height: 1.8; color: var(--text); }
 .news .prose p { margin: 0 0 .6em; }
 .news .prose p:last-child { margin-bottom: 0; }
+/* Status and 지난 소식 (2026-11-13, operator request). The label sits under the date; ended
+   news moves below a 지난 소식 heading, dimmed, with a smaller image. */
+.news-date time { display: block; }
+.news-status {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 1px 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  letter-spacing: .02em;
+  border-radius: 999px;
+  color: var(--muted);
+  border: 1px solid color-mix(in srgb, var(--text) 18%, transparent);
+}
+.news-item[data-status="current"] .news-status {
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+.news-past-heading {
+  margin: 40px 0 10px;
+  font-size: 12px;
+  font-weight: var(--weight);
+  color: var(--muted);
+  letter-spacing: .08em;
+}
+.news-past-heading[hidden] { display: none; }
+.news-past .news-item { opacity: .55; transition: opacity .2s; }
+.news-past .news-item:hover, .news-past .news-item:focus-within { opacity: .9; }
+.news-past .news-item.has-image { grid-template-columns: 7em 1fr 110px; }
+.news-past .news-item:first-child { border-top-style: dashed; }
+
 /* Promotional image beside the text (2026-11-13): ~180px, whole and uncropped (its own ratio),
    opens in the lightbox. On phones it goes under the text. */
 .news-item.has-image { grid-template-columns: 7em 1fr 180px; }

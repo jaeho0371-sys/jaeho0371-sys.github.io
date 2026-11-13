@@ -7,6 +7,8 @@
 //   2. View switch on series pages (크게 보기 / 목록 보기).
 //   3. Lightbox — a full-screen view of one work at its original aspect ratio,
 //                 with ←/→, Esc, swipe, and a #work-id URL for sharing.
+//   6. News status — 예정 / 진행 중 / 종료 from each item's dates and the visitor's today;
+//                 ended news moves under 지난 소식 (the page itself is built with the build day).
 //   5. Home slideshow — with slideshow: true and 2+ featured works, the featured area plays
 //                 like a video screen: ▶/❚❚, ‹ ›, ←/→, swipe, optional music with 🔈.
 //   4. Contact e-mail — the About page carries the address reversed in two halves
@@ -388,4 +390,31 @@
   // Stop when the page is left in the background, so music doesn't play on unseen.
   document.addEventListener("visibilitychange", function () { if (document.hidden && playing) setPlaying(false); });
 })();
+
+// ------------------------------------------------------------------ News status
+(function () {
+  "use strict";
+  var groups = document.querySelectorAll(".news-group");
+  if (!groups.length) return;
+  var d = new Date(), pad = function (n) { return (n < 10 ? "0" : "") + n; };
+  var today = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  var LABEL = { upcoming: "예정", current: "진행 중", ended: "종료" };
+  Array.prototype.forEach.call(groups, function (g) {
+    var now = g.querySelector(".news-now"), past = g.querySelector(".news-past");
+    var items = Array.prototype.slice.call(g.querySelectorAll(".news-item"));
+    items.forEach(function (li) {
+      var st = today < li.dataset.start ? "upcoming" : today > li.dataset.end ? "ended" : "current";
+      li.dataset.status = st;
+      li.querySelector(".news-status").textContent = LABEL[st];
+    });
+    // Current and upcoming: newest start first; ended: latest end first (same as the build).
+    var live = items.filter(function (li) { return li.dataset.status !== "ended"; })
+      .sort(function (a, b) { return a.dataset.start < b.dataset.start ? 1 : a.dataset.start > b.dataset.start ? -1 : 0; });
+    var gone = items.filter(function (li) { return li.dataset.status === "ended"; })
+      .sort(function (a, b) { return a.dataset.end < b.dataset.end ? 1 : a.dataset.end > b.dataset.end ? -1 : 0; });
+    live.forEach(function (li) { now.appendChild(li); });
+    gone.forEach(function (li) { past.appendChild(li); });
+    g.querySelector(".news-past-heading").hidden = !gone.length;
+  });
+})()
 
