@@ -35,7 +35,7 @@
      width="1440" height="1920"
      alt="Presence: No.1"
      style="background-color: #545a4b; --r: 0.7500; --sr: 0.8660"
-fetchpriority="high" decoding="async">
+loading="lazy" decoding="async">
 
   </figure>
   <figure class="featured-work" hidden>
@@ -59,6 +59,13 @@ loading="lazy" decoding="async">
 
   </figure>
 </section>
+<script>
+  (function () {
+    var f = document.querySelectorAll(".home-featured .featured-work");
+    var i = Math.floor(Math.random() * f.length);
+    if (i) { f[0].hidden = true; f[i].hidden = false; }
+  })();
+</script>
 <p class="slideshow-start-wrap">
   <button type="button" class="key slideshow-start" hidden aria-label="Play slideshow" title="Slideshow"
           data-interval="3" data-order="list">
