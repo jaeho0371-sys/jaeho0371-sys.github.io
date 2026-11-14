@@ -314,7 +314,18 @@
   }
 
   // ---- music: plays with the slideshow, fades in/out, follows Pause; 🔈 mutes (remembered)
-  var fadeTimer = null, audioRetried = false;
+  // Several pieces (data-tracks) play one after another in list order, then from the first
+  // again; with "until the music ends" (rounds -1) the end of the last one sends the screen home.
+  var fadeTimer = null, retried = {}, blobs = {};
+  var tracks = [], track = 0;
+  if (audio) {
+    try { tracks = JSON.parse(audio.dataset.tracks || "[]"); } catch (e) { tracks = []; }
+    tracks = tracks.map(function (t) { return (audio.dataset.root || "") + t; });
+  }
+  function loadTrack(i) {         // switch pieces; the next play() starts it from the beginning
+    track = i;
+    audio.src = blobs[i] || tracks[i];
+  }
   function fadeTo(target, ms, done) {
     clearInterval(fadeTimer);
     var from = audio.volume, t0 = Date.now();
@@ -332,7 +343,12 @@
   }
   function musicStop(rewind) {     // rewind: the next ▶ starts the music from the beginning
     if (!audio) return;
-    var done = function () { audio.pause(); if (rewind) try { audio.currentTime = 0; } catch (e) {} };
+    var done = function () {
+      audio.pause();
+      if (!rewind) return;
+      if (tracks.length > 1 && track !== 0) loadTrack(0);
+      else try { audio.currentTime = 0; } catch (e) {}
+    };
     if (audio.paused) done(); else fadeTo(0, rewind ? 900 : 500, done);
   }
   function syncMute() {
@@ -348,17 +364,28 @@
       try { localStorage.setItem("slideshow-muted", audio.muted ? "1" : "0"); } catch (e) {}
       syncMute();
     });
-    // "Until the music ends": when the piece finishes, the screen dissolves back to the featured
-    // work and stops, the last chord still sounding.
-    audio.addEventListener("ended", function () { if (rounds === -1 && playing) toHome(); });
-    // A server without byte ranges (some local previews) can't stream audio to Safari;
-    // then load the whole file once and play it from memory.
-    audio.addEventListener("error", function () {
-      if (audioRetried) return;
-      audioRetried = true;
-      fetch(audio.src).then(function (r) { return r.blob(); }).then(function (b) {
-        audio.src = URL.createObjectURL(b);
+    // A piece ended: go on to the next one. "Until the music ends": after the last piece the
+    // screen dissolves back to the featured work and stops, the last chord still sounding.
+    audio.addEventListener("ended", function () {
+      if (tracks.length > 1 && track < tracks.length - 1) {
+        loadTrack(track + 1);
         if (playing) musicPlay();
+      } else if (rounds === -1) {
+        if (playing) toHome();
+      } else if (tracks.length > 1) {   // a single piece loops by itself (the loop attribute)
+        loadTrack(0);
+        if (playing) musicPlay();
+      }
+    });
+    // A server without byte ranges (some local previews) can't stream audio to Safari;
+    // then load the whole file once and play it from memory (once per piece).
+    audio.addEventListener("error", function () {
+      var i = track;
+      if (retried[i] || !tracks[i]) return;
+      retried[i] = true;
+      fetch(tracks[i]).then(function (r) { return r.blob(); }).then(function (b) {
+        blobs[i] = URL.createObjectURL(b);
+        if (track === i) { audio.src = blobs[i]; if (playing) musicPlay(); }
       }).catch(function () {});
     });
   }
